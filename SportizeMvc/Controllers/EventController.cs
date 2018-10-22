@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using SportizeMvc.DAL;
@@ -16,24 +17,29 @@ namespace SportizeMvc.Controllers
         private SportizeContext db = new SportizeContext();
 
         // GET: Event
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(db.Events.ToList());
+            List<Event> events = await SalesforceConnect.GetEventsAsync();
+
+            return View(events.ToList());
         }
 
         // GET: Event/Details/5
-        public ActionResult Details(string id)
+        public async Task<ActionResult> Details(string id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Event @event = db.Events.Find(id);
-            if (@event == null)
+
+            //Event @event = db.Events.Find(id);
+            Event evento = await SalesforceConnect.GetEventByIdAsync(id);
+
+            if (evento == null)
             {
                 return HttpNotFound();
             }
-            return View(@event);
+            return View(evento);
         }
 
         // GET: Event/Create
@@ -47,12 +53,13 @@ namespace SportizeMvc.Controllers
         // obter mais detalhes, consulte https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Name,Description,EventDate,Address,Neighborhood,City,State")] Event @event)
+        public async Task<ActionResult> Create([Bind(Include = "ID,Name,Description,EventDate,Address,Neighborhood,City,State")] Event @event)
         {
             if (ModelState.IsValid)
             {
-                db.Events.Add(@event);
-                db.SaveChanges();
+                await SalesforceConnect.AddEventAsync(@event);
+                //db.Events.Add(@event);
+                //db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
@@ -60,17 +67,21 @@ namespace SportizeMvc.Controllers
         }
 
         // GET: Event/Edit/5
-        public ActionResult Edit(string id)
+        public async Task<ActionResult> Edit(string id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Event @event = db.Events.Find(id);
+
+            //Event @event = db.Events.Find(id);
+            Event @event = await SalesforceConnect.GetEventByIdAsync(id);
+
             if (@event == null)
             {
                 return HttpNotFound();
             }
+
             return View(@event);
         }
 
@@ -79,25 +90,30 @@ namespace SportizeMvc.Controllers
         // obter mais detalhes, consulte https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,Name,Description,EventDate,Address,Neighborhood,City,State")] Event @event)
+        public async Task<ActionResult> Edit([Bind(Include = "ID,Name,Description,EventDate,Address,Neighborhood,City,State")] Event @event)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(@event).State = EntityState.Modified;
-                db.SaveChanges();
+                //db.Entry(@event).State = EntityState.Modified;
+                //db.SaveChanges();
+                await SalesforceConnect.UpdateEventAsync(@event);
+
                 return RedirectToAction("Index");
             }
             return View(@event);
         }
 
         // GET: Event/Delete/5
-        public ActionResult Delete(string id)
+        public async Task<ActionResult> Delete(string id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Event @event = db.Events.Find(id);
+
+            //Event @event = db.Events.Find(id);
+            Event @event = await SalesforceConnect.GetEventByIdAsync(id);
+
             if (@event == null)
             {
                 return HttpNotFound();
@@ -108,11 +124,12 @@ namespace SportizeMvc.Controllers
         // POST: Event/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(string id)
+        public async Task<ActionResult> DeleteConfirmed(string id)
         {
-            Event @event = db.Events.Find(id);
-            db.Events.Remove(@event);
-            db.SaveChanges();
+            await SalesforceConnect.DeleteEventAsync(id);
+            //Event @event = db.Events.Find(id);
+            //db.Events.Remove(@event);
+            //db.SaveChanges();
             return RedirectToAction("Index");
         }
 

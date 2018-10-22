@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using SportizeMvc.DAL;
@@ -16,19 +17,24 @@ namespace SportizeMvc.Controllers
         private SportizeContext db = new SportizeContext();
 
         // GET: Group
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(db.Groups.ToList());
+            List<Group> groups = await SalesforceConnect.GetGroupsAsync();
+
+            return View(groups.ToList());
         }
 
         // GET: Group/Details/5
-        public ActionResult Details(string id)
+        public async Task<ActionResult> Details(string id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Group group = db.Groups.Find(id);
+
+            Group group = await SalesforceConnect.GetGroupByIdAsync(id);
+            //Group group = db.Groups.Find(id);
+
             if (group == null)
             {
                 return HttpNotFound();
@@ -47,12 +53,13 @@ namespace SportizeMvc.Controllers
         // obter mais detalhes, consulte https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Name,Description")] Group group)
+        public async Task<ActionResult> Create([Bind(Include = ",Name,Description")] Group group)
         {
             if (ModelState.IsValid)
             {
-                db.Groups.Add(group);
-                db.SaveChanges();
+                await SalesforceConnect.AddGroupAsync(group);
+                //db.Groups.Add(group);
+                //db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
@@ -60,17 +67,20 @@ namespace SportizeMvc.Controllers
         }
 
         // GET: Group/Edit/5
-        public ActionResult Edit(string id)
+        public async Task<ActionResult> Edit(string id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Group group = db.Groups.Find(id);
+
+            Group group = await SalesforceConnect.GetGroupByIdAsync(id);
+
             if (group == null)
             {
                 return HttpNotFound();
             }
+
             return View(group);
         }
 
@@ -79,25 +89,30 @@ namespace SportizeMvc.Controllers
         // obter mais detalhes, consulte https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,Name,Description")] Group group)
+        public async Task<ActionResult> Edit([Bind(Include = "ID,Name,Description")] Group group)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(group).State = EntityState.Modified;
-                db.SaveChanges();
+                //db.Entry(group).State = EntityState.Modified;
+                //db.SaveChanges();
+                await SalesforceConnect.UpdateGroupAsync(group);
+
                 return RedirectToAction("Index");
             }
             return View(group);
         }
 
         // GET: Group/Delete/5
-        public ActionResult Delete(string id)
+        public async Task<ActionResult> Delete(string id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Group group = db.Groups.Find(id);
+
+            //Group group = db.Groups.Find(id);
+            Group group = await SalesforceConnect.GetGroupByIdAsync(id);
+
             if (group == null)
             {
                 return HttpNotFound();
@@ -108,11 +123,13 @@ namespace SportizeMvc.Controllers
         // POST: Group/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(string id)
+        public async Task<ActionResult> DeleteConfirmed(string id)
         {
-            Group group = db.Groups.Find(id);
-            db.Groups.Remove(group);
-            db.SaveChanges();
+
+            await SalesforceConnect.DeleteGroupAsync(id);
+            //Group group = db.Groups.Find(id);
+            //db.Groups.Remove(group);
+            //db.SaveChanges();
             return RedirectToAction("Index");
         }
 

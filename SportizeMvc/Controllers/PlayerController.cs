@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using SportizeMvc.DAL;
@@ -16,19 +17,24 @@ namespace SportizeMvc.Controllers
         private SportizeContext db = new SportizeContext();
 
         // GET: Player
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(db.Players.ToList());
+            List<Player> players = await SalesforceConnect.GetPlayersAsync();
+
+            return View(players.ToList());
         }
 
         // GET: Player/Details/5
-        public ActionResult Details(string id)
+        public async Task<ActionResult> Details(string id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Player player = db.Players.Find(id);
+
+            //Player player = db.Players.Find(id);
+            Player player = await SalesforceConnect.GetPlayerByIdAsync(id);
+
             if (player == null)
             {
                 return HttpNotFound();
@@ -47,14 +53,15 @@ namespace SportizeMvc.Controllers
         // obter mais detalhes, consulte https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,Name,Email,Password,State,City,Neighborhood,Address")] Player player)
+        public async Task<ActionResult> Create([Bind(Include = "ID,Name,Email,Password,State,City,Neighborhood,Address")] Player player)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    db.Players.Add(player);
-                    db.SaveChanges();
+                    await SalesforceConnect.AddPlayerAsync(player);
+                    //db.Players.Add(player);
+                    //db.SaveChanges();
                     return RedirectToAction("Index");
                 }
             }
@@ -69,13 +76,16 @@ namespace SportizeMvc.Controllers
         }
 
         // GET: Player/Edit/5
-        public ActionResult Edit(string id)
+        public async Task<ActionResult> Edit(string id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Player player = db.Players.Find(id);
+
+            //Player player = db.Players.Find(id);
+            Player player = await SalesforceConnect.GetPlayerByIdAsync(id);
+
             if (player == null)
             {
                 return HttpNotFound();
@@ -88,25 +98,30 @@ namespace SportizeMvc.Controllers
         // obter mais detalhes, consulte https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ID,Name,Email,Password,State,City,Neighborhood,Address")] Player player)
+        public async Task<ActionResult> Edit([Bind(Include = "ID,Name,Email,Password,State,City,Neighborhood,Address")] Player player)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(player).State = EntityState.Modified;
-                db.SaveChanges();
+                //db.Entry(player).State = EntityState.Modified;
+                //db.SaveChanges();
+                await SalesforceConnect.UpdatePlayerAsync(player);
+
                 return RedirectToAction("Index");
             }
             return View(player);
         }
 
         // GET: Player/Delete/5
-        public ActionResult Delete(string id)
+        public async Task<ActionResult> Delete(string id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Player player = db.Players.Find(id);
+
+            //Player player = db.Players.Find(id);
+            Player player = await SalesforceConnect.GetPlayerByIdAsync(id);
+
             if (player == null)
             {
                 return HttpNotFound();
@@ -117,11 +132,12 @@ namespace SportizeMvc.Controllers
         // POST: Player/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(string id)
+        public async Task<ActionResult> DeleteConfirmed(string id)
         {
-            Player player = db.Players.Find(id);
-            db.Players.Remove(player);
-            db.SaveChanges();
+            await SalesforceConnect.DeletePlayerAsync(id);
+            //Player player = db.Players.Find(id);
+            //db.Players.Remove(player);
+            //db.SaveChanges();
             return RedirectToAction("Index");
         }
 

@@ -67,7 +67,7 @@
             @Html.DisplayFor(model => model.State)
         </dd>
 
-        <dt>
+        @*<dt>
             @Html.DisplayNameFor(model => model.Groups)
         </dt>
         <dd>
@@ -77,18 +77,18 @@
                     <th>Nome</th>
                 </tr>
                 @foreach (var item in Model.Groups)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ID)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                </tr>
-        }
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ID)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                    </tr>
+                }
             </table>
-        </dd>
+        </dd>*@
     </dl>
 </div>
 <p>
