@@ -24,7 +24,10 @@ textarea {
 }
 
 
-.navbar-inverse { background-color: #52ae0d; border-color: #52ae0d; }
+.navbar-inverse { background-color: #46940b; border-color: #46940b; }
 .navbar-inverse .navbar-brand { color: #f1f1f1; }
-.navbar-inverse .navbar-nav > li > a { color: #f1f1f1; }
+.navbar-inverse .navbar-nav > li > a { color: #f1f1f1; transition: ease .3s background; }
+.navbar-inverse .navbar-nav > li > a:hover { background-color: #4fac09; }
+.navbar-inverse .navbar-brand { transition: ease .3s transform; }
+.navbar-inverse .navbar-brand:hover { transform: scale(1.1); }
 .jumbotron h1 { font-weight: 700; color: #52ae0d; }
